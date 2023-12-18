@@ -14,7 +14,8 @@ from tqdm import tqdm
 
 class ModelNet40Dataset(InMemoryDataset):
 
-    def __init__(self, root, transform, pre_transform, train=True):
+    def __init__(self, root, transform, pre_transform, train=True, n_per_class=None):
+        self.n_per_class = n_per_class
         super().__init__(
             root=root,
             transform=transform,
@@ -22,6 +23,16 @@ class ModelNet40Dataset(InMemoryDataset):
         )
         path = self.processed_paths[0] if train else self.processed_paths[1]
         self.data, self.slices = torch.load(path)
+
+    @property
+    def raw_file_names(self):
+        # if at least one of the class directories is here, we probably don't need to re-download the dataset
+        return ['toilet']
+
+    @property
+    def processed_file_names(self):
+        # If these files are both present, then the preprocessing doesn't need to be re-done
+        return ['train.pt', 'test.pt']
 
     def download(self):
         # Download and extract the zip file
@@ -48,6 +59,8 @@ class ModelNet40Dataset(InMemoryDataset):
         for label_id, label in enumerate(classes):
             directory = os.path.join(self.raw_dir, label, dataset)
             paths = glob.glob(f'{directory}/{label}_*.off')
+            if self.n_per_class is not None and len(paths) > self.n_per_class:
+                paths = paths[:self.n_per_class]
             labeled_paths = labeled_paths + list(zip(paths, [label_id] * len(paths)))
 
         # Load all .off files from disc
