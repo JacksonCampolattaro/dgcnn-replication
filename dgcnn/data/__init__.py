@@ -1,0 +1,1 @@
+from .modelnet_datamodule import ModelNet40DataModule
