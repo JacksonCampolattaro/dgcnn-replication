@@ -62,5 +62,5 @@ class ModelNet40DataModule(LightningDataset):
         parser.add_argument('--num_points', type=int, default=1024)
         parser.add_argument('--batch_size', type=int, default=64)
         parser.add_argument('--sampling_factor', type=int, default=1)
-        parser.add_argument('--point_dropout', type=float, default=0.875)
         parser.add_argument('--include_normals', action=BooleanOptionalAction, default=False)
+        #parser.add_argument('--point_dropout', type=float, default=0.875)

@@ -11,18 +11,23 @@ from torchmetrics.classification import MulticlassAccuracy
 from aim.pytorch_lightning import AimLogger
 
 from dgcnn.nn.util import Sequential
-from dgcnn.nn import ClassifierHead
+from dgcnn.nn import ClassifierHead, DynamicEdgeConv
 from dgcnn.data import ModelNet40DataModule
 
 
 class DGCNNClassifier(LightningModule):
 
-    def __init__(self, num_classes, **kwargs):
+    def __init__(self, num_classes: int):
         super().__init__()
 
         self.model = Sequential(
-            # todo: embedding module
-            ClassifierHead(num_classes=num_classes)
+            DynamicEdgeConv(
+                in_channels=3,
+                k=20,
+                embedding_features=2048,
+                hidden_channels=[64, 64, 128, 256]
+            ),
+            ClassifierHead(num_classes=num_classes, embedding_features=2048)
         )
 
         self.loss = CrossEntropyLoss(label_smoothing=0.2)
@@ -63,7 +68,9 @@ def main(num_epochs, **args):
 
     dataset = ModelNet40DataModule(**args)
 
-    classifier = DGCNNClassifier(num_classes=40)
+    classifier = DGCNNClassifier(
+        num_classes=40,
+    )
 
     logger = AimLogger(
         experiment='dgcnn-replication',
@@ -88,8 +95,6 @@ def main(num_epochs, **args):
         dataset.train_dataloader(),
         dataset.val_dataloader()
     )
-
-    pass
 
 
 if __name__ == "__main__":

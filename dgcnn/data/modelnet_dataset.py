@@ -52,7 +52,6 @@ class ModelNet40Dataset(InMemoryDataset):
     def _process_set(self, dataset):
         classes = glob.glob(os.path.join(self.raw_dir, '*', ''))
         classes = sorted([x.split(os.sep)[-2] for x in classes])
-        print(classes)
 
         # Prepare a list of all .off files and their associated labels
         labeled_paths = []
@@ -73,20 +72,17 @@ class ModelNet40Dataset(InMemoryDataset):
             smoothing=0.1
         )
 
+        # Perform preprocessing on all files
         data_list = process_map(
             self._preprocess_data, data_list,
-            max_workers=31, chunksize=100,
+            max_workers=31, chunksize=10,
             desc="Preprocessing data",
             total=len(labeled_paths),
             bar_format='{l_bar}{bar}{r_bar}',
             smoothing=0.1
         )
 
-        exit(0)
-
-        # todo
-
-        pass
+        return self.collate(data_list)
 
     def _load_data(self, args):
         path, target = args
