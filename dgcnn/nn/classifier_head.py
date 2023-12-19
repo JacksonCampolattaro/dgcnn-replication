@@ -6,7 +6,7 @@ class ClassifierHead(Sequential):
     def __init__(self, num_classes: int, embedding_features=1024):
         super().__init__(*[
             # todo: is this layer norm beneficial?
-            # torch.nn.LayerNorm(embedding_features),
+            #LayerNorm(embedding_features),
             Linear(embedding_features, 512),
             LayerNorm(512),
             SiLU(),

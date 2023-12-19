@@ -11,7 +11,7 @@ from torchmetrics.classification import MulticlassAccuracy
 from aim.pytorch_lightning import AimLogger
 
 from dgcnn.nn.util import Sequential
-from dgcnn.nn import ClassifierHead, DynamicEdgeConv
+from dgcnn.nn import ClassifierHead, DynamicEdgeConv, TorchInfoSummary
 from dgcnn.data import ModelNet40DataModule
 
 
@@ -85,7 +85,8 @@ def main(num_epochs, **args):
         check_val_every_n_epoch=2,
         precision='bf16-mixed',
         callbacks=[
-            RichProgressBar()
+            TorchInfoSummary(depth=6),
+            RichProgressBar(),
         ],
         logger=logger
     )

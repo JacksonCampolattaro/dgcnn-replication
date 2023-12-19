@@ -5,7 +5,7 @@ from torch_geometric.data.lightning import LightningDataset
 from torch_geometric.transforms import Compose, NormalizeScale, SamplePoints
 
 from .modelnet_dataset import ModelNet40Dataset
-from .transforms import FarthestPointSample, RandomScaleDims, RandomShift, Shuffle
+from .transforms import FarthestPointSample, RandomScaleDims, RandomShift, Shuffle, RandomPointDropout
 
 
 class ModelNet40DataModule(LightningDataset):
@@ -28,8 +28,9 @@ class ModelNet40DataModule(LightningDataset):
 
         regularize = Compose([
             RandomScaleDims(scales=(2 / 3, 3 / 2)),
-            RandomShift(max_offset=0.2)
-            # todo: dropout goes here, if necessary
+            RandomShift(max_offset=0.2),
+            # todo: dropout might not be necessary
+            RandomPointDropout(max_dropout=0.875),
         ])
 
         transform = Compose([

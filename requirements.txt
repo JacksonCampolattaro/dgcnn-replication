@@ -6,5 +6,6 @@ torch-cluster==1.6.2+pt21cu121
 lightning
 torchmetrics
 rich
+torchinfo
 aim
 tqdm
