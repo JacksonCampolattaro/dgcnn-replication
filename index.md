@@ -1,6 +1,9 @@
 ---
 title: Reproducing DGCNN
-author: "Hesam Araghi and Jackson Campolattaro"
+author: 
+  - Hesam Araghi
+  - Jackson Campolattaro
+layout: post
 ---
 
 (todo: contents go here!)
