@@ -143,9 +143,9 @@ The original DGCNN used a fixed number of points (1024, in the case of the prima
 This implementation uses a dynamic point count, with the help of the batch_index pattern common in networks built
 with `torch_geometric`.
 
-Not only should this theoretically improve generalization and robustness to noise 
+Not only should this theoretically improve generalization and robustness to noise
 (see: [Noise Injection-based Regularization](https://arxiv.org/abs/2103.15027)),
-it also has the benefit of significantly increasing training size, 
+it also has the benefit of significantly increasing training size,
 because most batches will contain far fewer than the maximum of 1024*b points.
 This is especially important for DGCNN, because the KNN computation can be extremely expensive for high point counts.
 
@@ -153,7 +153,7 @@ This is especially important for DGCNN, because the KNN computation can be extre
 
 Many implementations of DGCNN perform BatchNorms inside the EdgeMLP layers.
 This is a more expensive operation when the number of points-per-batch is variable.
-We instead apply the BatchNorm _after_ the EdgeMLP, but before the max-pooling. 
+We instead apply the BatchNorm _after_ the EdgeMLP, but before the max-pooling.
 This should produce a similar effect, because the EdgeMLPs used in DGCNN only have one layer,
 and BatchNorms shouldn't change the max features in pooling.
 
@@ -161,20 +161,21 @@ and BatchNorms shouldn't change the max features in pooling.
 
 The classifier head has a few changes which make it more similar to contemporary networks,
 these changes showed minor improvements in convergence speed during testing:
+
 - Leaky ReLU has been replaced with SiLU
 - BatchNorm has been replaced with LayerNorm
 
 ## Hyperparameters
 
-| Parameter | Setting |
-| ~~~ | ~~~ |
-| Batch size | 64 |
-| Optimizer | AdamW |
-| Base Learning Rate | 1E-3 |
-| Lr-scheduler | Cosine Annealing |
-| # of Points (N) | 1024 |
-| # of Neighbors (k) | 20 |
-| # of Epochs | 250 |
+|          Parameter | Setting          |
+|-------------------:|:-----------------|
+|         Batch size | 64               |
+|          Optimizer | AdamW            |
+| Base Learning Rate | 1E-3             |
+|       Lr-scheduler | Cosine Annealing |
+|    # of Points (N) | 1024             |
+| # of Neighbors (k) | 20               |
+|        # of Epochs | 250              |
 
 ## Results
 
@@ -185,10 +186,9 @@ but this advantage is smaller in higher dimensions, such as those found in the l
 Because the KNN search accounts for >45% of runtime, this can still produce a useful reduction in runtim per epoch:
 
 | KNN Implementation | Time per Epoch (s) |
-| ~~~~~~~~~~~~~~~~~~ | ~~~~~~~~~~~~~~~~~~ |
-| Torch-cluster      | 15.16              |
-| KeOps              | 12.76              |
-
+|-------------------:|:------------------:|
+|      Torch-cluster |       15.16        |
+|              KeOps |       12.76        |
 
 #### Accuracy
 
