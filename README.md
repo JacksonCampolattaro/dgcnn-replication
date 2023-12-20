@@ -176,6 +176,7 @@ these changes showed minor improvements in convergence speed during testing:
 |    # of Points (N) | 1024             |
 | # of Neighbors (k) | 20               |
 |        # of Epochs | 250              |
+|   Train/Test split | 80/20            |
 
 ## Results
 
@@ -192,4 +193,7 @@ Because the KNN search accounts for >45% of runtime, this can still produce a us
 
 #### Accuracy
 
-(todo)
+| DGCNN Implementation | Mean Class Acuracy | Overall Accuracy |
+|---------------------:|:------------------:|------------------|
+|             Original |       90.2%        | 92.9%            |
+|                 Ours |       88.3%        | 91.9%            |

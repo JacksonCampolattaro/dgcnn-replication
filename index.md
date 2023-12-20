@@ -1,10 +1,13 @@
 ---
 title: Replicating DGCNN
-author: 
+author:
   - Hesam Araghi
   - Jackson Campolattaro
 layout: post
 ---
+
+For more information about this project or to try it out yourself, visit
+the [GitHub Repo](https://github.com/JacksonCampolattaro/dgcnn-replication).
 
 (todo: contents go here!)
 

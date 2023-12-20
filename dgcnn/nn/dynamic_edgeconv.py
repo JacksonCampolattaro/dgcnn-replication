@@ -45,5 +45,5 @@ class DynamicEdgeConv(Sequential):
     def add_args(parser):
         parser.add_argument("--k", type=int, default=20)
         parser.add_argument("--embedding_features", type=int, default=1024)
-        parser.add_argument("--hidden_channels", nargs='+', type=int, default=[64, 64, 64, 128])
+        parser.add_argument("--hidden_channels", nargs='+', type=int, default=[64, 64, 128, 256])
         return parser
