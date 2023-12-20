@@ -8,8 +8,8 @@ class PointMLPBlock(torch.nn.Sequential):
         super().__init__(
             torch.nn.Linear(in_channels, out_channels, bias=False),
             # torch.nn.BatchNorm1d(out_channels),
-            # InstanceNorm(out_channels),
-            torch.nn.LeakyReLU(negative_slope=0.2),
+            # torch.nn.LeakyReLU(negative_slope=0.2),
+            torch.nn.ReLU(),
         )
 
 
@@ -21,5 +21,5 @@ class PointMLP(torch.nn.Sequential):
                 PointMLPBlock(in_c, out_c)
                 for in_c, out_c in zip(channels[:-1], channels[1:])
             ],
-            torch.nn.BatchNorm1d(channels[-1])
+            # torch.nn.BatchNorm1d(channels[-1])
         )

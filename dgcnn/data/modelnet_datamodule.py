@@ -1,3 +1,4 @@
+import inspect
 import os.path
 from argparse import BooleanOptionalAction
 
@@ -16,7 +17,7 @@ class ModelNet40DataModule(LightningDataset):
             num_points: int,
             sampling_factor: int,
             include_normals: bool,
-            **kwargs
+            batch_size: int
     ):
         data_dir = os.path.join(data_dir, f'ModelNet40-{num_points}')
 
@@ -28,6 +29,7 @@ class ModelNet40DataModule(LightningDataset):
 
         regularize = Compose([
             RandomScaleDims(scales=(2 / 3, 3 / 2)),
+            # RandomScaleDims(scales=(4 / 5, 5 / 4)),
             RandomShift(max_offset=0.2),
             # todo: dropout might not be necessary
             RandomPointDropout(max_dropout=0.875),
@@ -54,7 +56,7 @@ class ModelNet40DataModule(LightningDataset):
             num_workers=31,
             persistent_workers=True,
             pin_memory=True,
-            **kwargs
+            batch_size=batch_size,
         )
 
     @staticmethod
@@ -64,4 +66,4 @@ class ModelNet40DataModule(LightningDataset):
         parser.add_argument('--batch_size', type=int, default=64)
         parser.add_argument('--sampling_factor', type=int, default=1)
         parser.add_argument('--include_normals', action=BooleanOptionalAction, default=False)
-        #parser.add_argument('--point_dropout', type=float, default=0.875)
+        # parser.add_argument('--point_dropout', type=float, default=0.875)

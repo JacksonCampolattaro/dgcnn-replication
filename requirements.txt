@@ -9,3 +9,4 @@ rich
 torchinfo
 aim
 tqdm
+pykeops==2.1.2
