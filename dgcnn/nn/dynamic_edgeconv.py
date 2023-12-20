@@ -4,7 +4,7 @@ import torch
 
 from dgcnn.nn.mlp import EdgeMLP, PointMLP
 from dgcnn.nn.util import Sequential, AppendNormals, Concatenate, SequentialWithConcatenatedResults, VNMaxMeanPool, \
-    DebugPrintShape
+    DebugPrintShape, VNMaxPool
 from dgcnn.geometry import FindNearestNeighbors, CollectEdgeFeatures
 
 from .centralize_edge_features import CentralizeEdgeFeatures
@@ -36,14 +36,14 @@ class DynamicEdgeConv(Sequential):
                     for in_c, out_c in zip(hidden_channels[:-1], hidden_channels[1:])
                 ],
             ),
-            PointMLP(sum(hidden_channels), [embedding_features // 2]),
-            VNMaxMeanPool(dim=1),
+            PointMLP(sum(hidden_channels), [embedding_features]),
+            VNMaxPool(),
         )
         self.out_features = embedding_features
 
     @staticmethod
     def add_args(parser):
         parser.add_argument("--k", type=int, default=20)
-        parser.add_argument("--embedding_features", type=int, default=2048)
+        parser.add_argument("--embedding_features", type=int, default=1024)
         parser.add_argument("--hidden_channels", nargs='+', type=int, default=[64, 64, 64, 128])
         return parser

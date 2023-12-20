@@ -29,7 +29,7 @@ class DGCNNClassifier(LightningModule):
 
         self.model = Sequential(
             invoke_with_matching_kwargs(DynamicEdgeConv, in_channels=6 if include_normals else 3, **kwargs),
-            ClassifierHead(num_classes=num_classes, embedding_features=2048)
+            invoke_with_matching_kwargs(ClassifierHead, num_classes=num_classes, **kwargs),
         )
 
         self.num_epochs = num_epochs

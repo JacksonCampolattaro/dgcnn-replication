@@ -1,5 +1,5 @@
 ---
-title: Reproducing DGCNN
+title: Replicating DGCNN
 author: 
   - Hesam Araghi
   - Jackson Campolattaro
