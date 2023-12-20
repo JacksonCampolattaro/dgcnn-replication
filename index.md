@@ -6,6 +6,9 @@ author:
 layout: post
 ---
 
+# Replicating DGCNN
+*Hesam Araghi and Jackson Campolattaro*
+
 For more information about this project or to try it out yourself, visit
 the [GitHub Repo](https://github.com/JacksonCampolattaro/dgcnn-replication).
 
