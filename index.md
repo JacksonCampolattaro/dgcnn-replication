@@ -23,11 +23,7 @@ In this section, we want to explain the working mechanism of the DGCNN method br
 EdgeConv takes as input a set of points and their corresponding features and computes the output features for each point. Each input point is represented by features associated with that point (such as its spatial coordinates, color, or intensity). Let 
 $\mathcal{G}=(\mathcal{V},\mathcal{E})$ 
 be a directed graph, where $\mathcal{V}$ is the set of graph nodes with the size of $\lvert \mathcal{V}\rvert = N$, and $\mathcal{E} \subseteq \mathcal{V}\times \mathcal{V}$ is the set of graph edges. Suppose, we have $N$ points which are represented by the nodes of the graph $\mathcal{G}$, and node input and output features are denoted by sets of vectors $\{\mathbf{x}_i^{(in)}\}_{i=1}^{N}\subseteq \mathbb{R}^{F_{in}}$ and $\{\mathbf{x}_i^{(out)}\}_{i=1}^{N}\subseteq \mathbb{R}^{F_{out}}$, respectively. For each edge $(i,j)\in\mathcal{E}$, the edge features are defined as $\mathbf{e}_{ij}=h_{\mathbf{\Theta}}(\mathbf{x}_i^{(in)},\mathbf{x}_j^{(in)})$, where function $h_{\mathbf{\Theta}}:\mathbb{R}^{F_{in}}\times\mathbb{R}^{F_{in}}\rightarrow \mathbb{R}^{F_{out}}$ maps the features of two neighboring nodes to the connecting edge features. The output features of node $i$ in EdgeConv layer can be obtained as
-
-$$
-\mathbf{x}^{(out)}_i =\mathop{\square}_{j\in \mathcal{N}_i} h_{\mathbf{\Theta}}(\mathbf{x}_i^{(in)},\mathbf{x}_j^{(in)}),
-$$
-
+$$\mathbf{x}^{(out)}_i =\mathop{\square}_{j\in \mathcal{N}_i} h_{\mathbf{\Theta}}(\mathbf{x}_i^{(in)},\mathbf{x}_j^{(in)}),$$
 where the operator $\square$ defines an aggregation operation that is permutation invariant. Examples of such operators are *summation* and *maximization*. The set $\mathcal{N}_i\subseteq\mathcal{V}$ defines the neighboring nodes for the node $i$. 
 
 For this paper, the authors choose the function $h_{\mathbf{\Theta}}(\mathbf{x}_i^{(in)},\mathbf{x}_j^{(in)})$ as follows:
