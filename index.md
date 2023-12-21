@@ -36,4 +36,4 @@ h_{\mathbf{\Theta}}(\mathbf{x}_i^{(in)},\mathbf{x}_j^{(in)})={\bar h}_{\mathbf{\
 ```
 where ${\bar h}_{\mathbf{\Theta}}$ is a multilayer perceptron network (MLP) with an input channel size of $2\,F_{in}$  and output channel size of $F_{out}$. The input to the MLP is the concatenated vector of $\mathop{concat}\big({\mathbf{x}_i^{(in)}},\mathbf{x}_j^{(in)} - \mathbf{x}_i^{(in)}\big)\in\mathbb{R}^{2\,F_{in}}$. The authors claim that with using 
 
-$i$ this is inline.
+$$i$$ this is inline.
