@@ -184,7 +184,7 @@ these changes showed minor improvements in convergence speed during testing:
 
 [KeOps](https://www.kernel-operations.io/keops/index.html) has large performance benefits for 3d KNN search,
 but this advantage is smaller in higher dimensions, such as those found in the later layers of DGCNN.
-Because the KNN search accounts for >45% of runtime, this can still produce a useful reduction in runtim per epoch:
+Because the KNN search accounts for >45% of runtime, this can still produce a useful reduction in runtime per epoch:
 
 | KNN Implementation | Time per Epoch (s) |
 |-------------------:|:------------------:|
@@ -193,7 +193,7 @@ Because the KNN search accounts for >45% of runtime, this can still produce a us
 
 #### Accuracy
 
-| DGCNN Implementation | Mean Class Acuracy | Overall Accuracy |
+| DGCNN Implementation | Mean Class Accuracy | Overall Accuracy |
 |---------------------:|:------------------:|------------------|
 |             Original |       90.2%        | 92.9%            |
 |                 Ours |       88.3%        | 91.9%            |
