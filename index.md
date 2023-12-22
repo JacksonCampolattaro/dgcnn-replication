@@ -61,3 +61,92 @@ This dynamic graph update distinguishes this work from the graph CNNs methods th
 The authors mentioned that dynamic graph update enables the network to aggregate features from spatially distant points without making the network very deep or constructing a very dense graph (e.g. fully connected graph). However, the dynamic graph update can impose very high computational complexity during both training and model inference. 
 In contrast to fixed graphs, where the graph is computed once per data sample and used throughout training epochs, in the dynamic scenario, during each forward pass of the network, the graph needs to be computed a number of times equal to the number of layers.
 This would be more severe especially when dealing with a larger number of points, as the complexity of computing the k-nearest neighbors (kNN) algorithm grows quadratically with the number of points.
+
+# Experiment results
+
+In this section, we present the results of our re-implemented of the DGCNN algorithm in the context of the *classification* task on the ModelNet40 dataset. We assess the classification accuracy with the results reported in the original paper. Additionally, we evaluate the efficiency of two distinct implementations of the k-nearest neighbors (kNN) method by measuring the training's running time.
+
+## Dataset 
+
+We used the ModelNet40 dataset \[2\] for point cloud classification. It contains 12,311 CAD models across 40 object categories like chairs, tables, and lamps. 
+Similar to the paper, we have the following settings for the dataset:
+- 9,843 models for training and 2,468 models for testing
+- We [normalize](https://github.com/JacksonCampolattaro/dgcnn-replication/blob/7e9c3935375b89ed1262b533c58d9e17a9bd447c/dgcnn/data/modelnet_datamodule.py#L25) the point cloud to fit in the unit sphere.
+- We [sample](https://github.com/JacksonCampolattaro/dgcnn-replication/blob/7e9c3935375b89ed1262b533c58d9e17a9bd447c/dgcnn/data/modelnet_datamodule.py#L26) uniformly 1024 points from the surfaces of the mesh faces. 
+- The following augmentations are performed during the training:
+	- Randomly [scaling](https://github.com/JacksonCampolattaro/dgcnn-replication/blob/7e9c3935375b89ed1262b533c58d9e17a9bd447c/dgcnn/data/modelnet_datamodule.py#L31) the objects within the scales (2/3,3/2).
+	- Randomly [shift](https://github.com/JacksonCampolattaro/dgcnn-replication/blob/7e9c3935375b89ed1262b533c58d9e17a9bd447c/dgcnn/data/modelnet_datamodule.py#L33) the objects by the maximum offset of 0.2.
+	- Randomly [drop](https://github.com/JacksonCampolattaro/dgcnn-replication/blob/7e9c3935375b89ed1262b533c58d9e17a9bd447c/dgcnn/data/modelnet_datamodule.py#L35) the points in the objects with the maximum ratio of 0.875.
+
+The original DGCNN used a fixed number of points while this implementation uses a random drop augmentation which can improve generalization and robustness to noise (see \[3\]). This can also help reduce the computation cost during the training because the KNN would usually be performed on a smaller number of points.
+
+## Network architecture
+
+The network consists of two parts: the feature extractor and the classification head.
+For the input feature, we concatenate the 3-dimensional position vector and surface normals, thus 
+$$F_{in} = 6$$.
+Then, the input points are given to the feature extractor part which has 4 EdgeConv layers. In each layer, first the graph is constructed using k-NN algorithm with 
+$$k=20$$.
+For implementing the k-NN algorithm, we tested two different implementations: 
+1) [torch-cluster](https://pytorch-geometric.readthedocs.io/en/latest/generated/torch_geometric.nn.pool.knn.html?highlight=knn#torch-geometric-nn-pool-knn) which is a fast implementation of k-NN on GPUs,
+2) [KeOps](https://www.kernel-operations.io/keops/index.html) \[4\] which is a library to speed up the computation of the reductions in large arrays in geometric applications.
+Then the edge features are created using an MLP network with output feature dimensions of (64, 64, 128, 256) for layers 1 to 4. Then, the edge features are aggregated with the 'max' operator.
+Then, the output features of all the layers are concatenated into a 64+64+128+256=512 feature vector. Then, an MLP network is applied to 512-dimensional features of each point to generate 1024-length feature vectors. We compute then a  global maximum on the whole feature vectors of the points.
+
+For the classification head, we used a 3-layer MLP network with hidden layer sizes of (512, 256, 40) with layer normalization, 50 percent dropout, and Sigmoid Linear Units (SiLUs) for the activation functions.
+
+The detailed differences between our implementation and the original paper are addressed in the [Material Difference](https://github.com/JacksonCampolattaro/dgcnn-replication/tree/main?tab=readme-ov-file#material-differences) section of the code repository.
+
+## Training hyperparameters:
+
+The following table contains the hyperparameters we used for the training of the network on the ModelNet dataset:
+
+|          Parameter | Setting          |
+|-------------------:|:-----------------|
+|         Batch size | 64               |
+|          Optimizer | AdamW            |
+| Base Learning Rate | 1E-3             |
+|       Lr-scheduler | Cosine Annealing |
+|    # of Points (N) | 1024             |
+| # of Neighbors (k) | 20               |
+|        # of Epochs | 250              |
+|   Train/Test split | 80/20            |
+
+## Classification results
+
+In this subsection, we assess both the computational performance and the accuracy of the re-implemented DGCNN algorithm in the classification task.
+
+### Computational performance
+
+For testing the efficiency of the re-implemented DGCNN algorithm, we measure the running time in seconds per epoch.
+The training is performed on a machine equipped with one Nvidia GeForce RTX 4090 GPU. 
+The following table presents the results for the two implementations of the k-NN: torch-cluster and KeOps.
+
+| KNN Implementation | Time per Epoch (s) |
+|-------------------:|:------------------:|
+|      Torch-cluster |       15.16        |
+|              KeOps |       12.76        |
+
+The results show that we can speed up the k-NN computation by replacing the current implementations such as torch-cluster with faster alternatives such as KeOps. However, KeOps has large performance benefits for 3d K-NN search, and this advantage fades out in higher dimensions, such as those found in the later layers of DGCNN.
+Because the KNN search accounts for >45% of runtime, this can still produce a useful reduction in runtime per epoch.
+### Accuracy
+
+The provided table illustrates the reproducibility results for our re-implementation of the DGCNN algorithm. "Overall accuracy" represents the percentage of correctly classified points across the entire point cloud dataset, while "mean class accuracy" is the mean accuracy computed by averaging accuracy values for each class.
+
+| DGCNN Implementation | Mean Class Accuracy | Overall Accuracy |
+|---------------------:|:------------------:|------------------|
+| Original paper | 90.2% | 92.9% |
+| Ours | 88.3% | 91.9% |
+
+Although our accuracies closely follow the original paper results, minor accuracy drops can be attributed to differences in implementation details, including varying augmentations (e.g., randomly dropping points), distinct training hyperparameters (e.g., using AdamW optimizer, different batch sizes), and slight changes in network architecture such as different implementations of batch normalization or the classification head. Nonetheless, our re-implementation demonstrates successful matching with the original paper, achieving accuracy levels close to the reported ones without doing the hyperparameter tuning.
+
+# References
+
+\[1\] Y. Wang, Y. Sun, Z. Liu, S. E. Sarma, M. M. Bronstein, and J. M. Solomon, **["Dynamic Graph CNN for Learning on Point Clouds,"](https://arxiv.org/abs/1801.07829)** ACM Trans. Graph., vol. 38, no. 5, Oct. 2019, Art. no. 146, pp. 1-12.
+
+\[2\] Z. Wu, S. Song, A. Khosla, F. Yu, L. Zhang, and X. Tang and J. Xiao, **["3D ShapeNets: A Deep Representation for Volumetric Shapes,"](http://3dvision.princeton.edu/projects/2014/3DShapeNets/paper.pdf)** CVPR 2015.
+
+\[3\] X. Zang, Y. Xie, S. Liao, J. Chen, and B. Yuan, **["Noise injection-based regularization for point cloud processing,"](https://arxiv.org/abs/2103.15027)** arXiv preprint arXiv:2103.15027, 2021.
+
+\[4\] B. Charlier, J. Feydy, J. A. Glaunès, F.-D. Collin, and G. Durif, **["Kernel Operations on the GPU, with Autodiff, without Memory Overflows,"](https://arxiv.org/abs/2004.11127)** Journal of Machine Learning Research, vol. 22, no. 74, pp. 1-6, 2021.
+
