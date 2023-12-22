@@ -6,17 +6,18 @@ author:
 layout: post
 ---
 
-# Replicating DGCNN
-*Hesam Araghi and Jackson Campolattaro*
 
-For more information about this project or to try it out yourself, visit
-the [GitHub Repo](https://github.com/JacksonCampolattaro/dgcnn-replication).
+# Reproducibility summary
+*Jackson Campolattaro and Hesam Araghi*
 
-(todo: contents go here!)
+- **Target Paper:** [**"Dynamic Graph CNN for Learning on Point Clouds"**](https://arxiv.org/abs/1801.07829) \[1\].
+- **Reproducibility Approach:** Employing the **“replicated”** criteria, our objective was to re-implement the DGCNN algorithm from scratch. This can help us to gain a deeper understanding of the DGCNN algorithm's implementation details.
+- **Reproducibility Project Repository:** Access the re-implementation code and comprehensive explanations in the [dgcnn-replication](https://github.com/JacksonCampolattaro/dgcnn-replication) GitHub Repository.
+- **Individual Contributions:**
+	- *Jackson Campolattaro:* Executing the re-implementation of the DGCNN algorithm and establishing the GitHub Repository.
+	- *Hesam Araghi:* Writing the reproducibility report and the documentation for the project.
 
-# Reproducibility summary:
-
-# Introduction:
+# Introduction
 
 Point clouds represent three-dimensional data in the spatial domain. Examples of point cloud data are LiDAR scanners, which generate spatial information by measuring distances with laser beams, and event camera data output, capturing changes in light intensity at pixel locations over time and converting them into 3D point clouds. Point clouds have various applications in 3D perception tasks, such as object recognition and scene understanding, and point cloud processing can have many applications in tasks such as autonomous navigation, self-driving vehicles, augmented reality, and robotics. 
 
@@ -29,7 +30,7 @@ One of the popular and widely utilized methods is dynamic graph CNN (DGCNN). Its
 In this reproducibility project, we opted to re-implement the DGCNN method and assess its performance in the shape classification task on the ModelNet40 dataset. We followed the “replicated” criteria, choosing to implement the DGCNN from scratch rather than relying on existing libraries like PyTorch Geometric. The reason was to gain a good understanding of the method's intricacies and its implementation details. Additionally, we used matrix and tensor operations to implement the algorithm instead of message passing used in the PyTorch Geometric library, aiming to potentially enhance execution speed, although it may come at the cost of reducing some flexibility in the algorithm.
 
 
-# Method:
+# Method
 
 In this section, we want to explain the working mechanism of the DGCNN method briefly. The distinguishing feature of the DGCNN method, setting it apart from previous approaches like PointNet, is that, instead of operating on individual points and aggregating their feature vectors, DGCNN generates an underlying graph on the points and performs convolution operations on features derived from the edges connecting neighboring points. Each layer is thus named "EdgeConv" to signify the convolution of edge features. Another difference from earlier methods is the dynamic nature of the graph in DGCNN. Unlike fixed graphs in previous models, the graph changes at each network layer. This dynamic graph is achieved by computing the k-nearest neighbors on the embeddings of the points (nodes of the graph) at each layer. In the following subsections, we explain edge convolution and dynamic graph updates.
 
@@ -97,7 +98,7 @@ For the classification head, we used a 3-layer MLP network with hidden layer siz
 
 The detailed differences between our implementation and the original paper are addressed in the [Material Difference](https://github.com/JacksonCampolattaro/dgcnn-replication/tree/main?tab=readme-ov-file#material-differences) section of the code repository.
 
-## Training hyperparameters:
+## Training hyperparameters
 
 The following table contains the hyperparameters we used for the training of the network on the ModelNet dataset:
 
